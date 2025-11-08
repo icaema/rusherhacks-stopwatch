@@ -1,0 +1,13 @@
+{
+  "Plugin-Class": "org.icaema.Stopwatch",
+  "Name": "${project.plugin_name}",
+  "Version": "${project.plugin_version}",
+  "Description": "Adds a stopwatch to the gui and commands to control it",
+  "URL": "https://github.com/RusherDevelopment/example-plugin",
+  "Authors": [
+    "Icaema"
+  ],
+  "Minecraft-Versions": [
+    "${project.minecraft_version}"
+  ]
+}
