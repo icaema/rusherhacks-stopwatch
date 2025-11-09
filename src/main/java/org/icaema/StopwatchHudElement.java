@@ -12,6 +12,7 @@ import org.rusherhack.core.setting.BooleanSetting;
 import org.rusherhack.core.utils.ColorUtils;
 
 import java.awt.*;
+import java.util.List;
 
 public class StopwatchHudElement extends HudElement {
 
@@ -52,10 +53,16 @@ public class StopwatchHudElement extends HudElement {
         }
 
         int iconSpace = (int) Math.ceil((fontSize*2)+2);
+        //RENDER ME TIME
         this.getFontRenderer().drawString(stopwatchTime.toTimeString(), iconSpace, 0, -1);
-        this.getFontRenderer().drawString("1: --:--:--.--", iconSpace, fontSize, -1);
-        this.getFontRenderer().drawString("2: --:--:--.--", iconSpace, fontSize*2, -1);
-        this.getFontRenderer().drawString("3: --:--:--.--", iconSpace, fontSize*3, -1);
+        if (stopwatchTime.lapsLength() == 0) {
+            this.getFontRenderer().drawString("[ 1]\t--:--:--.--", iconSpace, fontSize, -1);
+            return;
+        }
+        List<String> lapStrings = stopwatchTime.getLapStrings();
+        for (int i = 0; i < lapStrings.size(); i++) {
+            this.getFontRenderer().drawString("[%2d]\t%s".formatted((lapStrings.size()-i), lapStrings.get(i)), iconSpace, (i+1)*fontSize, -1);
+        }
     }
 
 
@@ -87,12 +94,12 @@ public class StopwatchHudElement extends HudElement {
 
     @Override
     public double getWidth() {
-        return 200;
+        return getFontRenderer().getStringWidth(stopwatchTime.toTimeString()) + (int) Math.ceil((getFontRenderer().getFontHeight()*2)+2);
     }
 
     @Override
     public double getHeight() {
-        return (getFontRenderer().getFontHeight() + 1) * 2;
+        return (getFontRenderer().getFontHeight() + 1) * 2 + stopwatchTime.lapsLength();
     }
 
 }

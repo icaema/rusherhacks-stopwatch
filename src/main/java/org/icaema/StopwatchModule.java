@@ -20,6 +20,7 @@ public class StopwatchModule extends ToggleableModule {
     private StopwatchTime stopwatchTime = StopwatchTime.getInstance();
 
     private final BooleanSetting s_reset = new BooleanSetting("Reset", "Reset the stopwatch", true);
+    private final BooleanSetting s_lap = new BooleanSetting("Lap", "Record lap time", true);
     private final BindSetting s_resetBind = new BindSetting("Reset Bind", NullKey.INSTANCE );
     private final BindSetting s_lapBind = new BindSetting("Lap Bind", NullKey.INSTANCE );
     private final BooleanSetting s_startOnJoin = new BooleanSetting("StartOnJoin", "Reset and start the timer when connecting to a server", true);
@@ -28,12 +29,18 @@ public class StopwatchModule extends ToggleableModule {
         super("Stopwatch", ModuleCategory.RENDER);
 
         this.s_reset.onChange(x -> {
-            stopwatchTime.reset();
+            if (!x) stopwatchTime.reset();
             this.s_reset.setValue(true);
+        });
+
+        this.s_lap.onChange(x -> {
+            if (!x) stopwatchTime.lap();
+            this.s_lap.setValue(true);
         });
 
         this.registerSettings(
                 s_reset,
+                s_lap,
                 s_resetBind,
                 s_lapBind,
                 s_startOnJoin
