@@ -38,27 +38,34 @@ public class StopwatchHudElement extends HudElement {
             this.getLogger().error("Failed to load stopwatch graphic", t);
         }
 
-        this.background.addSubSettings(backgroundColor);
-        this.registerSettings(background, s_showAtZero);
+//        this.background.addSubSettings(backgroundColor);
+        this.registerSettings(s_showAtZero);
     }
 
     @Override
     public void renderContent(RenderContext context, double mouseX, double mouseY) {
-        if (!this.s_showAtZero.getValue() && stopwatchTime.getTicks() == 0) return;
-
+        if (this.stopwatchGraphic == null) return;
         double fontSize = getFontRenderer().getFontHeight();
+        int iconSpace = (int) Math.ceil((fontSize*2)+2);
 
-        if (this.stopwatchGraphic != null) {
-            this.getRenderer().drawGraphicRectangle(this.stopwatchGraphic, 0, 0, fontSize*2, fontSize*2);
+        if (!this.s_showAtZero.getValue() && stopwatchTime.getTicks() == 0) {
+         if (mc.screen == RusherHackAPI.getThemeManager().getHudEditorScreen()) {
+             this.getRenderer().drawGraphicRectangle(this.stopwatchGraphic, 0, 0, fontSize*2, fontSize*2);
+             this.getFontRenderer().drawString(stopwatchTime.toTimeString(), iconSpace, 5, -1);
+         }
+         return;
         }
 
-        int iconSpace = (int) Math.ceil((fontSize*2)+2);
+        this.getRenderer().drawGraphicRectangle(this.stopwatchGraphic, 0, 0, fontSize*2, fontSize*2);
+
         //RENDER ME TIME
-        this.getFontRenderer().drawString(stopwatchTime.toTimeString(), iconSpace, 0, -1);
-        if (stopwatchTime.lapsLength() == 0) {
-            this.getFontRenderer().drawString("[ 1]\t--:--:--.--", iconSpace, fontSize, -1);
+        if (stopwatchTime.lapsLength() == 0){
+            this.getFontRenderer().drawString(stopwatchTime.toTimeString(), iconSpace, 5, -1);
             return;
         }
+
+        this.getFontRenderer().drawString(stopwatchTime.toTimeString(), iconSpace, 0, -1);
+
         List<String> lapStrings = stopwatchTime.getLapStrings();
         for (int i = 0; i < lapStrings.size(); i++) {
             this.getFontRenderer().drawString("[%2d]\t%s".formatted((lapStrings.size()-i), lapStrings.get(i)), iconSpace, (i+1)*fontSize, -1);
@@ -94,12 +101,17 @@ public class StopwatchHudElement extends HudElement {
 
     @Override
     public double getWidth() {
-        return getFontRenderer().getStringWidth(stopwatchTime.toTimeString()) + (int) Math.ceil((getFontRenderer().getFontHeight()*2)+2);
+        double fontSize = getFontRenderer().getFontHeight();
+        int iconSpace = (int) Math.ceil((fontSize*2)+2);
+        if (stopwatchTime.lapsLength() < 2) return (iconSpace*2.5) + getFontRenderer().getStringWidth(stopwatchTime.toTimeString());
+        return (iconSpace * 2.5) + getFontRenderer().getStringWidth(stopwatchTime.getLapStrings().getFirst());
     }
 
     @Override
     public double getHeight() {
-        return (getFontRenderer().getFontHeight() + 1) * 2 + stopwatchTime.lapsLength();
+        double fontSize = getFontRenderer().getFontHeight();
+        if (stopwatchTime.lapsLength() < 2) return fontSize * 2;
+        return fontSize * (stopwatchTime.lapsLength() + 1);
     }
 
 }
